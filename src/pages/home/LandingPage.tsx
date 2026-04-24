@@ -1,314 +1,413 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Star, Heart, ChevronRight, CheckCircle2, Calculator, TrendingUp, Mail, Globe, Phone, Quote, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; // <-- Tambahkan import Framer Motion
+import { 
+  Heart, Star, MapPin, Search, Smartphone, 
+  Play, Apple, Menu, User, ShieldCheck, Clock, Zap, ChevronRight
+} from 'lucide-react';
+import { formatRupiah, cn } from '../../lib/utils';
+
+// --- DATA DUMMY DENGAN GAMBAR ASLI ---
+const DUMMY_KOS = [
+  { id: 1, name: "Kos Exclusive Tembalang", location: "Tembalang, Semarang", price: 1500000, rating: 4.8, images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80"], ownerAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80" },
+  { id: 2, name: "Wisma Putri Kedungmundu", location: "Kedungmundu, Semarang", price: 850000, rating: 4.5, images: ["https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=80"], ownerAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" },
+  { id: 3, name: "Kost Putra Jati Gede", location: "Banyumanik, Semarang", price: 1200000, rating: 4.9, images: ["https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&q=80"], ownerAvatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&q=80" },
+  { id: 4, name: "Green Garden Residence", location: "Semarang Barat", price: 2100000, rating: 4.7, images: ["https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80"], ownerAvatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&q=80" },
+];
+
+// --- VARIANT ANIMASI (Diletakkan di luar komponen agar rapi) ---
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 } // Jeda waktu antar kartu muncul
+  }
+};
+
+const popIn = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.3 } }
+};
 
 export default function LandingPage() {
-  const [kamar, setKamar] = useState(10);
-  const hargaPerKamar = 1500000;
-  const estimasiPendapatan = kamar * hargaPerKamar;
+  const navigate = useNavigate();
+  
+  const [searchForm, setSearchForm] = useState({
+    location: '',
+    type: '',
+    maxPrice: '',
+    checkIn: '',
+    checkOut: ''
+  });
 
-  const formatRupiah = (angka: number) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })
-      .format(angka)
-      .replace(/\u00A0/g, ' '); 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setSearchForm({ ...searchForm, [e.target.name]: e.target.value });
   };
 
-  const fadeUpVariant = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault(); 
+    const params = new URLSearchParams();
+    if (searchForm.location) params.append('location', searchForm.location);
+    if (searchForm.type) params.append('type', searchForm.type);
+    if (searchForm.maxPrice) params.append('maxPrice', searchForm.maxPrice);
+    navigate(`/dashboard?${params.toString()}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yk-deepblue via-[#051026] to-yk-deepblue font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-800 overflow-hidden">
       
-      {/* NAVBAR */}
-      <motion.div 
-        initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}
-        className="fixed top-0 left-0 w-full pt-4 px-4 sm:pt-6 sm:px-6 z-50"
+      {/* === NAVBAR === */}
+      {/* Navbar dianimasikan turun dari atas */}
+      <motion.nav 
+        initial={{ y: -100 }} 
+        animate={{ y: 0 }} 
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all"
       >
-        <nav className="max-w-6xl mx-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-4 sm:px-6 h-16 flex items-center justify-between shadow-xl">
-          <div className="flex items-center gap-2 sm:gap-3">
-          <div className="h-8 sm:h-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center shadow-inner px-2 overflow-hidden">
-            <img src="/logo-yukkos.svg" alt="Yukkos Logo" className="h-[80%] w-auto object-contain drop-shadow-md" />
-          </div>
-            <span className="text-xl sm:text-2xl font-bold text-white tracking-tight">Yuk<span className="text-yk-cherry">kos</span></span>
-          </div>
-          
-          <div className="hidden lg:flex items-center gap-8">
-            <a href="#ekosistem" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Ekosistem</a>
-            <a href="#cerita" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Cerita Mitra</a>
-            <a href="#simulasi" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Simulasi Cuan</a>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link 
-              to="/login" 
-              className="text-xs sm:text-sm font-bold text-slate-300 hover:text-white px-3 py-2 rounded-full transition-colors hidden sm:block"
-            >
-              Masuk
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
+              <span className="font-extrabold text-2xl tracking-tight">
+                <span className="text-slate-900">Yuk</span>
+                <span className="text-orange-500">kos</span>
+              </span>
             </Link>
-            
-            <Link 
-              to="/register" 
-              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-yk-cherry text-white text-xs sm:text-sm font-bold rounded-full hover:bg-yk-cherry-hover transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(239,57,20,0.4)] flex items-center gap-2"
-            >
-              Daftar <span className="hidden sm:inline">Sekarang</span>
-            </Link>
+
+            {/* Menu Tengah */}
+            <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
+              <Link to="/" className="text-yk-cherry font-bold">Home</Link>
+              <Link to="#cari" className="hover:text-yk-cherry transition-colors">Cari Kost</Link>
+              <Link to="#promo" className="hover:text-yk-cherry transition-colors">Promo</Link>
+            </div>
+
+            {/* Tombol Kanan */}
+            <div className="hidden md:flex items-center gap-4">
+              <Link to="/login" className="font-bold text-sm text-slate-700 hover:text-yk-cherry transition-colors">Masuk</Link>
+              <Link to="/register" className="bg-yk-cherry hover:bg-yk-cherry/90 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-yk-cherry/20 transition-all hover:-translate-y-0.5">
+                Daftar Sekarang
+              </Link>
+            </div>
           </div>
-        </nav>
-      </motion.div>
+        </div>
+      </motion.nav>
 
-      <main id="ekosistem" className="pt-32 sm:pt-36 pb-20 px-4 sm:px-6 relative">
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-[300px] sm:h-[500px] bg-gradient-to-r from-yk-cherry/20 to-orange-500/10 rounded-full blur-[80px] sm:blur-[120px] -z-10 pointer-events-none"></div>
+      {/* === HERO SECTION === */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 flex flex-col justify-center min-h-[600px]">
+        {/* Gambar Latar Belakang & Overlay */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <motion.img 
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 10, ease: "easeOut" }}
+            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1600&auto=format&fit=crop" 
+            alt="Latar Belakang Kost Nyaman" 
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=1600&auto=format&fit=crop"; }}
+          />
+          <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F8F9FA] via-transparent to-transparent"></div>
+        </div>
 
-        {/* HERO SECTION */}
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-8 items-center mt-6 sm:mt-10">
+        {/* Konten Hero (Teks) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          {/* Teks Hero menggunakan motion.div dengan staggered children */}
           <motion.div 
-            initial="hidden" animate="visible"
-            variants={{ hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0, transition: { duration: 0.8, staggerChildren: 0.2 } } }}
-            className="text-left relative z-10"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="max-w-2xl space-y-6 mb-12"
           >
-            <motion.div variants={fadeUpVariant} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-orange-400 text-xs sm:text-sm font-medium mb-6 backdrop-blur-md">
-              <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-orange-400 text-orange-400" />
-              Platform Pilihan Juragan Kos
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white font-bold text-xs uppercase tracking-wide border border-white/20 backdrop-blur-md">
+              <Zap size={14} className="text-yellow-400 fill-current" /> Platform Manajemen dan Pencarian Kost #1
             </motion.div>
             
-            <motion.h1 variants={fadeUpVariant} className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tighter">
-              Ngekos Nggak Pake <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yk-cherry to-orange-400">
-                Ribet!
-              </span>
+            <motion.h1 variants={fadeInUp} className="text-5xl lg:text-7xl font-black text-white leading-tight tracking-tight">
+              Ngekost Nggak <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-yk-cherry to-orange-400">Pake Ribet!</span>
             </motion.h1>
             
-            <motion.p variants={fadeUpVariant} className="text-base sm:text-lg text-slate-300 mb-8 sm:mb-10 leading-relaxed font-light max-w-lg">
-              Tinggalkan buku catatan kusam Anda. Yukkos bantu promosikan kamar kosong Anda, sambil menagih uang sewa secara otomatis. Urus kos jadi lebih santai.
+            <motion.p variants={fadeInUp} className="text-lg text-slate-200 leading-relaxed max-w-lg">
+              Temukan kost idaman di sekitar lingkungan kegiatanmu dengan mudah. Transparansi harga, bebas biaya tersembunyi, dan fasilitas terjamin.
             </motion.p>
-            
-            <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row items-center gap-4">
-              <Link to="/dashboard" className="px-6 py-4 w-full sm:w-auto rounded-xl bg-white text-yk-deepblue font-extrabold text-base sm:text-lg flex items-center justify-center gap-2 hover:bg-slate-100 shadow-xl transition-all hover:-translate-y-1 group">
-                Mulai Listing Sekarang <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
           </motion.div>
-
-          {/* MOCKUP CARD VISUAL */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: "easeOut" }}
-            className="relative w-full max-w-md mx-auto lg:ml-auto group mt-8 lg:mt-0"
-          >
-            <div className="absolute -inset-1 bg-gradient-to-r from-yk-cherry to-orange-400 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="bg-white p-4 rounded-[2rem] shadow-2xl relative z-10">
-              <div className="w-full h-40 sm:h-48 bg-slate-200 rounded-2xl mb-4 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-300 to-slate-200"></div>
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-xs font-bold text-slate-700">
-                  <Heart className="w-3 h-3 text-yk-cherry fill-yk-cherry" /> 124 Suka
-                </div>
-              </div>
-              <div className="px-2">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-800">KosanGrid Tlogosari</h3>
-                <p className="text-xs sm:text-sm text-slate-500 flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" /> Semarang, Jawa Tengah</p>
-                <div className="border-t border-slate-100 pt-4 mt-4 flex justify-between items-center">
-                  <p className="text-xs text-slate-500">Mulai dari</p>
-                  <p className="text-base sm:text-lg font-extrabold text-yk-cherry">Rp 1.200.000<span className="text-[10px] sm:text-xs text-slate-400 font-normal">/bln</span></p>
-                </div>
-              </div>
-            </div>
-
-            <motion.div 
-              animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              className="absolute -bottom-4 -left-2 sm:-bottom-6 sm:-left-10 bg-yk-deepblue-light border border-white/10 p-3 sm:p-4 rounded-2xl shadow-xl z-20"
-            >
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yk-cherry/20 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-yk-cherry" />
-                </div>
-                <div>
-                  <p className="text-[10px] sm:text-xs text-slate-300 font-medium">Kamar A-02</p>
-                  <p className="text-xs sm:text-sm font-bold text-white">Baru saja disewa!</p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* CERITA MITRA */}
-        <div id="cerita" className="max-w-6xl mx-auto mt-32 sm:mt-40 border-t border-white/5 pt-16 sm:pt-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6 }}
-            className="text-center mb-12 sm:mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Kisah Sukses <span className="text-yk-cherry">Mitra Yukkos</span></h2>
-            <p className="text-sm sm:text-base text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
-              Mendengar langsung bagaimana sistem otomatis Yukkos membantu Juragan Kos memaksimalkan potensi properti mereka.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white/[0.02] border border-white/5 p-6 sm:p-8 rounded-[2rem] hover:border-yk-cherry/30 transition-colors relative group shadow-2xl"
-            >
-              <Quote className="absolute top-6 right-6 w-8 h-8 sm:w-10 sm:h-10 text-white/5 group-hover:text-yk-cherry/10 transition-colors" />
-              <div className="flex items-center gap-1 mb-6">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 fill-orange-400" />)}
-              </div>
-              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed mb-8 relative z-10 min-h-[120px] sm:min-h-[140px]">
-                "Awalnya ragu, tapi sejak pakai Yukkos, 15 kamar saya penuh terus. Fitur pengingat tagihan otomatisnya ke WhatsApp itu juara banget."
-              </p>
-              <div className="flex items-center gap-4 border-t border-white/5 pt-6 mt-auto">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yk-cherry/10 flex items-center justify-center border border-yk-cherry/20">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-yk-cherry" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-xs sm:text-sm">Bapak Bintoro</h4>
-                  <p className="text-[10px] sm:text-xs text-slate-500">Pemilik KosanGrid</p>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white/[0.02] border border-white/5 p-6 sm:p-8 rounded-[2rem] hover:border-yk-cherry/30 transition-colors relative group shadow-2xl"
-            >
-              <Quote className="absolute top-6 right-6 w-8 h-8 sm:w-10 sm:h-10 text-white/5 group-hover:text-yk-cherry/10 transition-colors" />
-              <div className="flex items-center gap-1 mb-6">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 fill-orange-400" />)}
-              </div>
-              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed mb-8 relative z-10 min-h-[120px] sm:min-h-[140px]">
-                "Tampilannya sangat bersih dan gampang dipahami. Onboarding-nya kilat, hari ini daftar, besoknya langsung ada yang survei kamar."
-              </p>
-              <div className="flex items-center gap-4 border-t border-white/5 pt-6 mt-auto">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-xs sm:text-sm">Ibu Anisa</h4>
-                  <p className="text-[10px] sm:text-xs text-slate-500">Juragan Kos Putri</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white/[0.02] border border-white/5 p-6 sm:p-8 rounded-[2rem] hover:border-yk-cherry/30 transition-colors relative group shadow-2xl hidden md:block"
-            >
-              <Quote className="absolute top-6 right-6 w-8 h-8 sm:w-10 sm:h-10 text-white/5 group-hover:text-yk-cherry/10 transition-colors" />
-              <div className="flex items-center gap-1 mb-6">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 fill-orange-400" />)}
-              </div>
-              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed mb-8 relative z-10 min-h-[120px] sm:min-h-[140px]">
-                "Fitur analitik finansialnya luar biasa. Saya jadi tahu persis proyeksi pendapatan bulan depan dan potensi kerugian kalau ada kamar kosong."
-              </p>
-              <div className="flex items-center gap-4 border-t border-white/5 pt-6 mt-auto">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-700/30 flex items-center justify-center border border-slate-700/50">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-xs sm:text-sm">Mas Dimas</h4>
-                  <p className="text-[10px] sm:text-xs text-slate-500">Manajer Properti</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        <motion.div 
-          id="simulasi" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUpVariant}
-          className="max-w-6xl mx-auto mt-32 sm:mt-40 bg-yk-deepblue-light/50 border border-white/10 rounded-[2rem] sm:rounded-[3rem] p-6 lg:p-12 relative overflow-hidden shadow-2xl"
-        >
-          <div className="absolute top-0 right-0 w-60 h-60 sm:w-80 sm:h-80 bg-yk-cherry/10 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
           
-          <div className="grid lg:grid-cols-5 gap-8 lg:gap-10 items-center relative z-10 w-full">
-            
-            {/* Kolom Kiri */}
-            <div className="col-span-1 lg:col-span-3 min-w-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6 sm:mb-8 border border-orange-500/20 shadow-inner">
-                <Calculator className="text-orange-400 w-6 h-6 sm:w-7 sm:h-7" />
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-5 tracking-tight">Atur Strategi Kesuksesan Anda</h2>
-              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed mb-8 max-w-xl">
-                Yukkos memberdayakan Anda dengan visibilitas finansial penuh. Simulasikan jumlah kamar, dan lihat potensi arus kas bersih yang bisa Anda amankan.
-              </p>
-              
-              <div className="mb-6 p-4 sm:p-6 bg-yk-deepblue/50 rounded-2xl border border-white/5 shadow-inner">
-                <div className="flex justify-between items-center mb-4 sm:mb-5">
-                  <label className="text-sm sm:text-base font-semibold text-white">Jumlah Kamar Kosong Saat Ini:</label>
-                  <span className="text-xl sm:text-2xl font-black text-yk-cherry">{kamar} Kamar</span>
+          {/* --- FORM PENCARIAN (Animasi Pop In) --- */}
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={popIn}
+            className="bg-white p-5 lg:p-6 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-7xl backdrop-blur-xl relative z-20"
+          >
+            <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4 lg:items-end">
+              {/* Lokasi */}
+              <div className="flex-1 space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Lokasi Kost</label>
+                <div className="relative">
+                  <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input 
+                    type="text" name="location" value={searchForm.location} onChange={handleInputChange}
+                    placeholder="Tembalang" 
+                    className="w-full pl-10 pr-3 py-3.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-yk-cherry" 
+                  />
                 </div>
-                <input 
-                  type="range" min="1" max="50" value={kamar} 
-                  onChange={(e) => setKamar(Number(e.target.value))}
-                  className="w-full h-2 sm:h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yk-cherry"
-                  style={{ accentColor: '#ef3914' }}
-                />
               </div>
-            </div>
 
-            {/* Kolom Kanan (Kartu Angka) */}
-            <div className="col-span-1 lg:col-span-2 bg-[#081735] p-6 sm:p-8 lg:p-10 rounded-3xl border border-white/10 shadow-3xl text-center relative w-full min-w-0">
-              <div className="absolute -top-4 -right-2 sm:-top-5 sm:-right-5 w-14 h-14 sm:w-20 sm:h-20 bg-yk-deepblue-light rounded-full border border-white/10 flex items-center justify-center shadow-2xl">
-                 <TrendingUp className="w-6 h-6 sm:w-10 sm:h-10 text-yk-cherry animate-pulse" />
+              {/* Tipe Kost */}
+              <div className="w-full lg:w-48 space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Tipe Kost</label>
+                <select name="type" value={searchForm.type} onChange={handleInputChange} className="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-yk-cherry bg-white">
+                  <option value="">Semua Tipe</option>
+                  <option value="putra">Putra</option>
+                  <option value="putri">Putri</option>
+                  <option value="campur">Campur</option>
+                </select>
               </div>
-              <p className="text-slate-400 text-xs sm:text-sm font-semibold mb-2 sm:mb-3 uppercase tracking-widest break-words">ESTIMASI PENDAPATAN BULANAN</p>
-              
-              <h3 className="text-4xl lg:text-4xl xl:text-5xl font-extrabold text-white mb-6 sm:mb-8 tracking-tighter break-words">
-                {formatRupiah(estimasiPendapatan)}
-              </h3>
-              
-              <p className="text-[10px] sm:text-xs text-slate-500 mb-6 sm:mb-10 max-w-xs mx-auto">Angka di atas adalah potensi pendapatan kotor bulan depan dengan tingkat hunian 100% dan rata-rata sewa Rp 1.5 Juta/kamar.</p>
-              <Link to="/dashboard" className="w-full block py-3 sm:py-4 rounded-xl bg-yk-cherry text-white font-extrabold hover:bg-yk-cherry-hover transition-colors shadow-lg shadow-yk-cherry/30 text-sm sm:text-base">
-                Klaim Cuan Sekarang
-              </Link>
-            </div>
-            
-          </div>
+
+              {/* Harga */}
+              <div className="w-full lg:w-48 space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Harga Max</label>
+                <select name="maxPrice" value={searchForm.maxPrice} onChange={handleInputChange} className="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-yk-cherry bg-white">
+                  <option value="">Semua Harga</option>
+                  <option value="1000000">&lt; Rp 1 Juta</option>
+                  <option value="2000000">Rp 1 - 2 Juta</option>
+                  <option value="3000000">&gt; Rp 2 Juta</option>
+                </select>
+              </div>
+
+              {/* Tanggal */}
+              <div className="flex w-full lg:w-auto gap-4">
+                <div className="flex-1 lg:w-40 space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 tracking-wider">Masuk</label>
+                  <input 
+                    type="date" name="checkIn" value={searchForm.checkIn} onChange={handleInputChange} 
+                    className="w-full px-3 py-3.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-yk-cherry bg-white text-slate-700" 
+                  />
+                </div>
+                <div className="flex-1 lg:w-40 space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 tracking-wider">Keluar</label>
+                  <input 
+                    type="date" name="checkOut" value={searchForm.checkOut} onChange={handleInputChange} 
+                    className="w-full px-3 py-3.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-yk-cherry bg-white text-slate-700" 
+                  />
+                </div>
+              </div>
+
+              {/* Tombol Cari */}
+              <button type="submit" className="w-full lg:w-40 bg-yk-cherry hover:bg-yk-cherry/90 text-white font-bold p-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-yk-cherry/30 h-[50px] shrink-0 mt-2 lg:mt-0">
+                <Search size={18} /> Cari Kos
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* === SECTION 1: REKOMENDASI TEMPAT KOST === */}
+      {/* Animasi scroll trigger (muncul saat di-scroll) */}
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={staggerContainer}
+        className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      >
+        <motion.div variants={fadeInUp}>
+          <SectionHeader title="Rekomendasi Tempat Kost" />
         </motion.div>
-      </main>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {DUMMY_KOS.map((kos) => (
+             <motion.div key={kos.id} variants={fadeInUp}>
+                <KosCard kos={kos} />
+             </motion.div>
+          ))}
+        </div>
+      </motion.section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/5 bg-[#051026] mt-20 pt-16 sm:pt-20 pb-8 px-6">``
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10 sm:gap-12 mb-12 sm:mb-16">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-               <div className="bg-white/5 p-1.5 rounded-lg border border-white/10">
-                 <img src="/logo-yukkos.svg" alt="Yukkos Logo" className="h-8 sm:h-10 w-auto object-contain drop-shadow-lg" />
-               </div>
-               <span className="text-xl sm:text-2xl font-bold text-white tracking-tight">Yuk<span className="text-yk-cherry opacity-80">kos</span></span>
+      {/* === SECTION 2: TEMPAT KOST TERDEKAT === */}
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={staggerContainer}
+        className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      >
+        <motion.div variants={fadeInUp} className="flex justify-between items-end mb-8">
+          <SectionHeader title="Tempat Kost Terdekat" noMargin />
+          <button className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-yk-cherry transition-colors bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
+            <MapPin size={16} /> Lihat di Peta
+          </button>
+        </motion.div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {DUMMY_KOS.map((kos) => (
+             <motion.div key={`near-${kos.id}`} variants={fadeInUp}>
+                 <KosCard kos={kos} />
+             </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* === BANNER PROMO BERCERITA === */}
+      <motion.section 
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6 }}
+        className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" id="promo"
+      >
+        <div className="bg-slate-900 rounded-[3rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-2xl">
+          <div className="relative z-10 max-w-lg">
+            <div className="inline-block px-3 py-1 bg-white/10 text-white rounded-full text-xs font-bold tracking-wider mb-4 border border-white/20">
+              Pencarian Yukkos
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm max-w-sm leading-relaxed mb-6 font-light">
-              Ngekos nggak pake ribet! Kami mentransformasi manajemen properti konvensional menjadi ekosistem digital otomatis yang menguntungkan.
-            </p>
-            <div className="flex gap-3">
-              {[Globe, Mail, Phone].map((Icon, i) => <a href="#" key={i} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:bg-yk-cherry hover:text-white transition-all"><Icon className="w-3 h-3 sm:w-4 sm:h-4" /></a>)}
-            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">Cari Tempat Kost Nyaman,<br/>Tanpa Drama.</h2>
+            <p className="text-slate-300 mb-8 text-lg">Jelajahi tempat kost berdasarkan kebutuhan, tipe, dan harga. Mulai hidup mandiri dengan tenang.</p>
+            <button className="bg-white text-slate-900 px-8 py-4 rounded-full font-bold transition-all hover:scale-105 shadow-lg flex items-center gap-2">
+              Mulai Eksplorasi <ChevronRight size={18} />
+            </button>
           </div>
-          <div>
-            <h4 className="text-white font-bold mb-4 sm:mb-6 tracking-wide text-sm sm:text-base">Ekosistem</h4>
-            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-slate-400 font-light">
-              {['Pemilik Kos', 'Pencari Kos', 'Analitik Bisnis', 'Manajemen Unit', 'Kontrak Digital'].map(link => <li key={link}><a href="#" className="hover:text-yk-cherry transition-colors">{link}</a></li>)}
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4 sm:mb-6 tracking-wide text-sm sm:text-base">Perusahaan</h4>
-            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-slate-400 font-light">
-              {['Tentang Kami', 'Karir', 'Pusat Mitra', 'Jadi Investor', 'Hubungi Kami'].map(link => <li key={link}><a href="#" className="hover:text-yk-cherry transition-colors">{link}</a></li>)}
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4 sm:mb-6 tracking-wide text-sm sm:text-base">Legal</h4>
-            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-slate-400 font-light">
-              {['Syarat & Ketentuan', 'Kebijakan Privasi', 'Keamanan Data'].map(link => <li key={link}><a href="#" className="hover:text-yk-cherry transition-colors">{link}</a></li>)}
-            </ul>
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 hidden md:block">
+            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" alt="Premium Room" className="w-full h-full object-cover rounded-l-[5rem] opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/50 to-transparent"></div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 text-[10px] sm:text-xs font-mono text-center md:text-left">© 2026 Yukkos Platform (MVP v1.0). Ngekos Nggak Pake Ribet!</p>
-          <p className="text-slate-500 text-[10px] sm:text-xs flex items-center gap-2 font-mono">
-            <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> support@yukkos.id
-          </p>
+      </motion.section>
+
+      {/* === APP PROMO EKSKLUSIF === */}
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6 }}
+        className="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
+      >
+        <div className="bg-gradient-to-br from-yk-cherry/10 to-orange-500/10 rounded-[3rem] p-10 md:p-16 flex flex-col md:flex-row items-center gap-12 border border-white shadow-xl">
+          <div className="flex-1 flex justify-center relative">
+             <div className="w-64 h-[500px] bg-slate-900 rounded-[3rem] border-[12px] border-white shadow-2xl flex items-center justify-center relative overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=600&auto=format&fit=crop" alt="App Mockup" className="w-full h-full object-cover opacity-80" />
+                <div className="absolute top-0 w-32 h-6 bg-white rounded-b-3xl"></div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black/40">
+                  <span className="font-extrabold text-3xl mb-2 tracking-tighter">Yukkos</span>
+                  <p className="text-xs">Ngekos Ngga Pake Ribet!</p>
+                </div>
+             </div>
+          </div>
+          <div className="flex-1 space-y-6 text-center md:text-left">
+            <h2 className="text-4xl lg:text-5xl font-black text-slate-900 leading-tight">Kost Impianmu,<br/>Di Dalam Genggaman.</h2>
+            <p className="text-slate-600 text-lg leading-relaxed">Booking lebih cepat, pantau tagihan, dan chat langsung dengan pemilik kos melalui aplikasi mobile Yukkos. Download sekarang!</p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+              <button className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg hover:-translate-y-1">
+                <Play size={24} className="text-green-400" /> 
+                <div className="text-left leading-tight">
+                  <div className="text-[10px] text-slate-300 font-normal">GET IT ON</div>
+                  <div>Google Play</div>
+                </div>
+              </button>
+              <button className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg hover:-translate-y-1">
+                <Apple size={24} /> 
+                <div className="text-left leading-tight">
+                  <div className="text-[10px] text-slate-300 font-normal">Download on the</div>
+                  <div>App Store</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* === FOOTER === */}
+      <footer className="bg-[#EAEAEA] pt-16 pb-8 border-t border-slate-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+            <div className="lg:col-span-5 space-y-6">
+              <Link to="/" className="inline-block">
+                <h2 className="text-5xl font-black tracking-tighter">
+                  <span className="text-slate-900">Yuk</span><span className="text-orange-500">kos</span>
+                </h2>
+              </Link>
+              <p className="text-slate-700 text-sm leading-relaxed max-w-sm font-medium">
+                Ngekos nggak pake ribet! Kami mentransformasi manajemen properti konvensional menjadi ekosistem digital otomatis yang menguntungkan
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2">
+                <button className="flex items-center gap-3 bg-[#D1D5DB] hover:bg-slate-400 text-slate-800 px-5 py-3 rounded-xl font-bold text-sm transition-all shadow-sm"><Play size={20} className="fill-current" /> PlayStore</button>
+                <button className="flex items-center gap-3 bg-[#D1D5DB] hover:bg-slate-400 text-slate-800 px-5 py-3 rounded-xl font-bold text-sm transition-all shadow-sm"><Apple size={20} className="fill-current" /> AppleStore</button>
+              </div>
+            </div>
+            <div className="lg:col-span-2 space-y-5">
+              <h4 className="font-extrabold text-slate-800 tracking-widest uppercase text-sm">Perusahaan</h4>
+              <ul className="space-y-4 text-sm text-slate-600 font-medium">
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Tentang Kami</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Informasi</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Kontak Kami</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Blog</Link></li>
+              </ul>
+            </div>
+            <div className="lg:col-span-2 space-y-5">
+              <h4 className="font-extrabold text-slate-800 tracking-widest uppercase text-sm">Bantuan</h4>
+              <ul className="space-y-4 text-sm text-slate-600 font-medium">
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Cari Kost</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Menjadi Pemilik</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">Kenapa Kami?</Link></li>
+                <li><Link to="#" className="hover:text-orange-500 transition-colors">FAQs</Link></li>
+              </ul>
+            </div>
+            <div className="lg:col-span-3 space-y-5">
+              <h4 className="font-extrabold text-slate-800 tracking-widest uppercase text-sm">Info Kontak</h4>
+              <ul className="space-y-4 text-sm text-slate-600 font-medium">
+                <li>1234567890</li>
+                <li>hello@mamfull.com</li>
+                <li className="leading-relaxed">Jl. Soekarno-Hatta, Tlogosari Kulon, Pedurungan, Kota Semarang, Jawa Tengah</li>
+              </ul>
+              <div className="flex gap-4 pt-3">
+                <div className="p-2 bg-slate-500 text-white rounded-md hover:bg-orange-500 transition-colors cursor-pointer"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7.5v4H10V22h4v-8.5z"/></svg></div>
+                <div className="p-2 bg-slate-500 text-white rounded-md hover:bg-orange-500 transition-colors cursor-pointer"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22.162 5.656c-.764.338-1.573.56-2.413.666.863-.514 1.518-1.317 1.827-2.283-.817.485-1.721.834-2.684 1.022-.774-.823-1.883-1.323-3.097-1.323-2.348 0-4.244 1.896-4.244 4.236 0 .334.034.659.106.97C8.137 8.767 5.019 7.075 2.946 4.539c-.366.63-.576 1.359-.576 2.133 0 1.468.75 2.765 1.886 3.524-.697-.019-1.352-.213-1.916-.53v.052c0 2.053 1.462 3.768 3.393 4.153-.353.097-.727.146-1.113.146-.272 0-.536-.023-.792-.073.539 1.678 2.101 2.903 3.955 2.939-1.453 1.139-3.285 1.814-5.276 1.814-.343 0-.682-.019-1.016-.06 1.878 1.205 4.11 1.905 6.513 1.905 7.819 0 12.095-6.478 12.095-12.099 0-.184-.004-.367-.014-.548.831-.599 1.551-1.36 2.076-2.238z"/></svg></div>
+                <div className="p-2 bg-slate-500 text-white rounded-md hover:bg-orange-500 transition-colors cursor-pointer"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+                <div className="p-2 bg-slate-500 text-white rounded-md hover:bg-orange-500 transition-colors cursor-pointer"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-slate-300 text-slate-800 font-bold text-sm">
+            <div>© 2026 Yukkos | All rights reserved</div>
+            <div className="mt-4 md:mt-0">Mamalia Fullstack Team</div>
+          </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+// --- SUB-KOMPONEN ---
+function SectionHeader({ title, noMargin = false }: { title: string, noMargin?: boolean }) {
+  return (
+    <div className={noMargin ? '' : 'mb-8'}>
+      <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight">{title}</h2>
+      <div className="w-16 h-1.5 bg-yk-cherry rounded-full"></div>
+    </div>
+  );
+}
+
+function KosCard({ kos, showRating = false }: { kos: any, showRating?: boolean }) {
+  return (
+    <div className="group cursor-pointer flex flex-col h-full bg-white rounded-2xl p-3 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="relative aspect-[4/5] bg-slate-200 rounded-xl overflow-hidden mb-4">
+        <img src={kos.images[0]} alt={kos.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/600x400/F1F3F5/black?text=Gambar+Kos"; }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <button className="absolute top-3 right-3 w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-yk-cherry hover:scale-110 transition-all z-10"><Heart size={16} /></button>
+        <div className="absolute bottom-3 left-3 w-10 h-10 bg-white rounded-full border-2 border-white shadow-md z-10 overflow-hidden"><img src={kos.ownerAvatar} alt="Owner" className="w-full h-full object-cover" /></div>
+        {showRating && (
+          <div className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm z-10"><Star size={12} className="text-yellow-500 fill-current" /><span className="text-[10px] font-bold text-slate-800">{kos.rating}</span></div>
+        )}
+      </div>
+      <div className="flex flex-col flex-grow px-1">
+        <h3 className="font-bold text-slate-900 text-base leading-tight group-hover:text-yk-cherry transition-colors line-clamp-1">{kos.name}</h3>
+        <p className="text-slate-500 text-xs flex items-center gap-1 mt-1 mb-3"><MapPin size={12} className="text-slate-400 shrink-0" /> <span className="truncate">{kos.location}</span></p>
+        <div className="mt-auto pt-3 border-t border-slate-100">
+          <p className="font-black text-slate-900 text-lg leading-none">{formatRupiah(kos.price)} <span className="text-[10px] text-slate-400 font-medium uppercase">/ bulan</span></p>
+        </div>
+      </div>
     </div>
   );
 }

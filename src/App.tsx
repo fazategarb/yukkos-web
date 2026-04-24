@@ -5,8 +5,9 @@ import PublicRoute from './routes/PublicRoute';
 
 // Import Pages
 import LandingPage from './pages/home/LandingPage';
-import Register from './pages/auth/Register';
-import Login from './pages/auth/Login';
+import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import LoginPage from './pages/auth/LoginPage';
 import Dashboard from './pages/dashboard/Dashboard';
 
 export default function App() {
@@ -30,8 +31,9 @@ export default function App() {
 
         {/* Rute guest */}
         <Route element={<PublicRoute />}>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
 
         {/* Rute private */}

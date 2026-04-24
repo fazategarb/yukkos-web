@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Search, MapPin, Star, Filter, Heart, ChevronRight, ChevronLeft,
-  Sparkles, Flame, Clock, Map as MapIcon, LayoutGrid 
+  Search, MapPin, Star, Heart, ChevronRight, ChevronLeft,
+  Sparkles, Clock, Map as MapIcon, LayoutGrid 
 } from 'lucide-react';
 import { formatRupiah, cn } from '../../../lib/utils';
 
