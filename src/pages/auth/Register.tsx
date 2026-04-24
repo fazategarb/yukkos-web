@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Building2, UserCircle2, ArrowRight, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Building2, UserCircle2, ArrowRight, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { registerUser } from '../../services/auth';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -13,34 +15,18 @@ export default function Register() {
   });
   
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
-      // Panggil API Backend Anda
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Terjadi kesalahan saat mendaftar');
-      }
-
-      setSuccess(true);
-      // Pindah ke halaman login setelah 2 detik
+      await registerUser(formData); 
+      
+      toast.success('Registrasi berhasil! Mengarahkan ke login...');
       setTimeout(() => navigate('/login'), 2000);
-
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message || 'Gagal mendaftar');
     } finally {
       setLoading(false);
     }
@@ -67,21 +53,6 @@ export default function Register() {
           <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">Mulai Perjalanan Anda</h2>
           <p className="text-sm text-slate-400 font-light">Bergabung dengan ekosistem kos digital terbaik.</p>
         </div>
-
-        {/* Pesan Error / Sukses */}
-        {error && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-200">{error}</p>
-          </motion.div>
-        )}
-        
-        {success && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-green-200">Registrasi berhasil! Mengarahkan ke halaman login...</p>
-          </motion.div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Pemilihan Role */}
@@ -170,13 +141,11 @@ export default function Register() {
           {/* Tombol Submit */}
           <button
             type="submit"
-            disabled={loading || success}
+            disabled={loading}
             className="w-full mt-6 py-4 px-4 bg-yk-cherry hover:bg-yk-cherry-hover text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(239,57,20,0.3)]"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
-            ) : success ? (
-              "Berhasil!"
             ) : (
               <>Buat Akun Yukkos <ArrowRight className="w-5 h-5" /></>
             )}

@@ -1,22 +1,37 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import WebDashboard from './components/WebDashboard';
-import Register from './components/Register';
-import Login from './components/Login';
+import { Toaster } from 'react-hot-toast';
+import ProtectedRoute from './routes/ProtectedRoute';
 
-function App() {
+// Import Pages
+import LandingPage from './pages/home/LandingPage';
+import Register from './pages/auth/Register';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/dashboard/Dashboard';
+
+export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-yk-dark selection:bg-yk-normal selection:text-yk-dark text-slate-200">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<Register />} />
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: '#1e293b',
+            color: '#fff',
+            borderRadius: '10px',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }} 
+      />
+
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<WebDashboard />} />
-        </Routes>
-      </div>
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

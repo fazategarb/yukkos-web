@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, AlertCircle, Loader2, LogIn } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Loader2, LogIn } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { loginUser } from '../../services/auth';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,25 +20,8 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Email atau password salah');
-      }
-
-      // SIMPAN TOKEN & DATA USER
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      // Arahkan ke Dashboard atau Home
-      navigate('/');
-      
+      await loginUser(formData);
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {

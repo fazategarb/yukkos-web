@@ -42,7 +42,6 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            {/* Tombol Login (Masuk) - Gaya Transparan/Outline */}
             <Link 
               to="/login" 
               className="text-xs sm:text-sm font-bold text-slate-300 hover:text-white px-3 py-2 rounded-full transition-colors hidden sm:block"
@@ -50,7 +49,6 @@ export default function LandingPage() {
               Masuk
             </Link>
             
-            {/* Tombol Register (Daftar) - Gaya Tombol Utama (Solid) */}
             <Link 
               to="/register" 
               className="px-4 py-2 sm:px-5 sm:py-2.5 bg-yk-cherry text-white text-xs sm:text-sm font-bold rounded-full hover:bg-yk-cherry-hover transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(239,57,20,0.4)] flex items-center gap-2"
