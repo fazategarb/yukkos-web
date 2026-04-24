@@ -88,7 +88,7 @@ export default function OwnerSidebar({ handleLogout }: { handleLogout: () => voi
         >
           <LogOut size={20} className="shrink-0" />
           {!isCollapsed && (
-            <span className="font-medium text-sm whitespace-nowrap">Keluar (Logout)</span>
+            <span className="font-medium text-sm whitespace-nowrap">Keluar</span>
           )}
         </button>
       </div>
