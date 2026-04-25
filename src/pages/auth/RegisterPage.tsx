@@ -1,23 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // <-- Import Framer Motion
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { 
   User, Mail, Lock, Phone, ArrowRight, 
   Building2, Home, CheckCircle2, Eye, EyeOff
 } from 'lucide-react';
 import { cn } from '../../lib/utils'; 
 
-// --- VARIANT ANIMASI ---
-const fadeInUp = {
+// --- VARIANT ANIMASI DENGAN TYPE VARIANTS ---
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15 } // Jeda antar elemen
+    transition: { staggerChildren: 0.15 }
   }
 };
 

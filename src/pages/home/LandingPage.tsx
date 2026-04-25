@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // <-- Tambahkan import Framer Motion
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { 
-  Heart, Star, MapPin, Search, Smartphone, 
-  Play, Apple, Menu, User, ShieldCheck, Clock, Zap, ChevronRight
+  Heart, Star, MapPin, Search, 
+  Play, Apple, Zap, ChevronRight
 } from 'lucide-react';
-import { formatRupiah, cn } from '../../lib/utils';
+import { formatRupiah } from '../../lib/utils';
 
 // --- DATA DUMMY DENGAN GAMBAR ASLI ---
 const DUMMY_KOS = [
@@ -15,21 +16,21 @@ const DUMMY_KOS = [
   { id: 4, name: "Green Garden Residence", location: "Semarang Barat", price: 2100000, rating: 4.7, images: ["https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80"], ownerAvatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&q=80" },
 ];
 
-// --- VARIANT ANIMASI (Diletakkan di luar komponen agar rapi) ---
-const fadeInUp = {
+// --- VARIANT ANIMASI DENGAN TYPE VARIANTS ---
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15 } // Jeda waktu antar kartu muncul
+    transition: { staggerChildren: 0.15 }
   }
 };
 
-const popIn = {
+const popIn: Variants = {
   hidden: { opacity: 0, scale: 0.9, y: 20 },
   visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.3 } }
 };
