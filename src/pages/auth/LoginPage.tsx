@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { Mail, Lock, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
-// --- VARIANT ANIMASI DENGAN TYPE VARIANTS ---
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
@@ -36,7 +35,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Ganti ini dengan integrasi API Auth NestJS Anda nantinya
+    // TODO: Ganti ini dengan integrasi API Auth NestJS
     console.log('Logging in...', formData);
     
     // Simulasi loading sebentar lalu lempar ke dashboard
